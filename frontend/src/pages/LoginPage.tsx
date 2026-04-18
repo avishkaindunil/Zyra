@@ -6,6 +6,7 @@ import { Loader2, Zap, Mail, Lock } from 'lucide-react'
 import { loginSchema, LoginFormData } from '../lib/schemas'
 import { useAuthStore } from '../store/authStore'
 import { useToastContext } from '../components/ui/ToastProvider'
+import { ThemeToggle } from '../components/ui/ThemeToggle'
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -42,26 +43,29 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-base bg-gradient-mesh flex items-center justify-center p-4">
-      {/* Background orbs */}
-      <div className="fixed top-0 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="fixed bottom-0 right-1/4 w-64 h-64 bg-status-open/5 rounded-full blur-3xl pointer-events-none" />
+    <div className="relative flex min-h-screen items-center justify-center bg-surface-base bg-gradient-mesh p-4">
+      <div className="fixed right-4 top-4 z-20">
+        <ThemeToggle />
+      </div>
+
+      <div className="pointer-events-none fixed left-1/4 top-0 h-96 w-96 rounded-full bg-accent/8 blur-3xl" />
+      <div className="pointer-events-none fixed bottom-0 right-1/4 h-64 w-64 rounded-full bg-status-open/8 blur-3xl" />
 
       <div className="w-full max-w-md animate-slide-up">
-        {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center shadow-glow-accent mb-4">
+        <div className="mb-8 flex flex-col items-center">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent shadow-glow-accent">
             <Zap size={22} className="text-white" />
           </div>
-          <h1 className="font-display font-bold text-3xl text-gradient-subtle">Zyra</h1>
-          <p className="text-content-muted text-sm mt-1">Premium Issue Tracking</p>
+          <h1 className="font-display text-3xl font-bold text-gradient-subtle">Zyra</h1>
+          <p className="mt-1 text-sm text-content-muted">Premium Issue Tracking</p>
         </div>
 
-        {/* Card */}
-        <div className="glass-card p-8">
+        <div className="glass-card p-8 shadow-card">
           <div className="mb-6">
-            <h2 className="font-display font-semibold text-xl text-content-primary">Sign in</h2>
-            <p className="text-content-secondary text-sm mt-1">Welcome back. Enter your credentials to continue.</p>
+            <h2 className="font-display text-xl font-semibold text-content-primary">Sign in</h2>
+            <p className="mt-1 text-sm text-content-secondary">
+              Welcome back. Enter your credentials to continue.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -78,7 +82,7 @@ export function LoginPage() {
                 />
               </div>
               {errors.email && (
-                <p className="text-xs text-priority-critical mt-1.5">{errors.email.message}</p>
+                <p className="mt-1.5 text-xs text-priority-critical">{errors.email.message}</p>
               )}
             </div>
 
@@ -95,11 +99,11 @@ export function LoginPage() {
                 />
               </div>
               {errors.password && (
-                <p className="text-xs text-priority-critical mt-1.5">{errors.password.message}</p>
+                <p className="mt-1.5 text-xs text-priority-critical">{errors.password.message}</p>
               )}
             </div>
 
-            <button type="submit" disabled={isLoading} className="btn-primary w-full py-3 mt-2">
+            <button type="submit" disabled={isLoading} className="btn-primary mt-2 w-full py-3">
               {isLoading ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
@@ -111,10 +115,10 @@ export function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-border text-center">
+          <div className="mt-6 border-t border-border pt-5 text-center">
             <p className="text-sm text-content-muted">
               Don't have an account?{' '}
-              <Link to="/register" className="text-accent hover:text-accent-hover font-medium transition-colors">
+              <Link to="/register" className="font-medium text-accent transition-colors hover:text-accent-hover">
                 Create one
               </Link>
             </p>

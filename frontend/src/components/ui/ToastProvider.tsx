@@ -1,7 +1,6 @@
 import React, { createContext, useContext } from 'react'
+import { CheckCircle, XCircle, AlertTriangle, Info, X, LucideIcon } from 'lucide-react'
 import { useToast, Toast, ToastVariant } from '../../hooks/useToast'
-import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
 import { cn } from '../../lib/utils'
 
 interface ToastContextValue {
@@ -30,16 +29,16 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
   return (
     <div
       className={cn(
-        'flex items-start gap-3 px-4 py-3 rounded-xl border shadow-modal backdrop-blur-sm',
-        'animate-slide-up min-w-[300px] max-w-[420px]',
+        'flex min-w-[300px] max-w-[420px] items-start gap-3 rounded-xl border px-4 py-3 shadow-modal backdrop-blur-sm',
+        'animate-slide-up',
         TOAST_STYLES[toast.variant]
       )}
     >
       <Icon size={16} className="mt-0.5 shrink-0" />
-      <p className="text-sm font-medium flex-1 text-content-primary">{toast.message}</p>
+      <p className="flex-1 text-sm font-medium text-content-primary">{toast.message}</p>
       <button
         onClick={() => onRemove(toast.id)}
-        className="text-content-muted hover:text-content-secondary transition-colors shrink-0"
+        className="shrink-0 text-content-muted transition-colors hover:text-content-secondary"
       >
         <X size={14} />
       </button>
@@ -53,9 +52,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast: addToast }}>
       {children}
-      <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 items-end">
-        {toasts.map((t) => (
-          <ToastItem key={t.id} toast={t} onRemove={removeToast} />
+      <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-2">
+        {toasts.map((toastItem) => (
+          <ToastItem key={toastItem.id} toast={toastItem} onRemove={removeToast} />
         ))}
       </div>
     </ToastContext.Provider>
@@ -63,7 +62,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useToastContext() {
-  const ctx = useContext(ToastContext)
-  if (!ctx) throw new Error('useToastContext must be used within ToastProvider')
-  return ctx
+  const context = useContext(ToastContext)
+
+  if (!context) {
+    throw new Error('useToastContext must be used within ToastProvider')
+  }
+
+  return context
 }

@@ -115,11 +115,11 @@ async function main() {
   const hashedPassword = await bcrypt.hash('password123', 12)
 
   const user = await prisma.user.upsert({
-    where: { email: 'demo@zyra.dev' },
+    where: { email: 'demo@zyra.test' },
     update: {},
     create: {
       name: 'Ranil Wickremesinghe',
-      email: 'demo@zyra.dev',
+      email: 'demo@zyra.test',
       password: hashedPassword,
     },
   })
@@ -129,11 +129,11 @@ async function main() {
 
   // Create a second user
   const user2 = await prisma.user.upsert({
-    where: { email: 'mahinda@zyra.dev' },
+    where: { email: 'mahinda@zyra.test' },
     update: {},
     create: {
       name: 'Mahinda Rajapaksa',
-      email: 'mahinda@zyra.dev',
+      email: 'mahinda@zyra.test',
       password: hashedPassword,
     },
   })
@@ -161,7 +161,7 @@ async function main() {
   console.log(`\n🎉 Seeded ${DEMO_ISSUES.length} demo issues successfully!`)
   console.log('\n─────────────────────────────────────────')
   console.log('  Login at http://localhost:5173/login')
-  console.log('  Email:    demo@zyra.dev')
+  console.log('  Email:    demo@zyra.test')
   console.log('  Password: password123')
   console.log('─────────────────────────────────────────\n')
 }

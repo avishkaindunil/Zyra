@@ -28,20 +28,20 @@ export function ConfirmDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in"
+        className="absolute inset-0 bg-overlay/70 backdrop-blur-sm animate-fade-in"
         onClick={onCancel}
       />
-      <div className="relative glass-card shadow-modal w-full max-w-md animate-slide-up p-6">
+      <div className="relative w-full max-w-md animate-slide-up glass-card p-6 shadow-modal">
         <button
           onClick={onCancel}
-          className="absolute top-4 right-4 text-content-muted hover:text-content-secondary transition-colors"
+          className="absolute right-4 top-4 text-content-muted transition-colors hover:text-content-secondary"
         >
           <X size={18} />
         </button>
 
-        <div className="flex items-start gap-4 mb-6">
+        <div className="mb-6 flex items-start gap-4">
           <div
-            className={`p-2.5 rounded-xl ${
+            className={`rounded-xl p-2.5 ${
               variant === 'danger'
                 ? 'bg-priority-critical-bg text-priority-critical'
                 : 'bg-priority-high-bg text-priority-high'
@@ -50,27 +50,25 @@ export function ConfirmDialog({
             <AlertTriangle size={20} />
           </div>
           <div>
-            <h3 className="font-display font-semibold text-content-primary text-lg leading-tight mb-1">
+            <h3 className="mb-1 font-display text-lg font-semibold leading-tight text-content-primary">
               {title}
             </h3>
-            <p className="text-content-secondary text-sm leading-relaxed">{message}</p>
+            <p className="text-sm leading-relaxed text-content-secondary">{message}</p>
           </div>
         </div>
 
-        <div className="flex gap-3 justify-end">
+        <div className="flex justify-end gap-3">
           <button onClick={onCancel} className="btn-secondary" disabled={isLoading}>
             {cancelLabel}
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className={
-              variant === 'danger' ? 'btn-danger' : 'btn-primary'
-            }
+            className={variant === 'danger' ? 'btn-danger' : 'btn-primary'}
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
                 Processing...
               </span>
             ) : (

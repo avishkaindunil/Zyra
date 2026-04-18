@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { ThemeProvider } from './components/ui/ThemeProvider'
 import { ToastProvider } from './components/ui/ToastProvider'
 import { AppLayout } from './components/layout/AppLayout'
 import { ProtectedRoute } from './components/layout/ProtectedRoute'
@@ -10,27 +11,26 @@ import { IssueDetailPage } from './pages/IssueDetailPage'
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ToastProvider>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+    <ThemeProvider>
+      <BrowserRouter>
+        <ToastProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-          {/* Protected routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/issues" element={<IssuesPage />} />
-              <Route path="/issues/:id" element={<IssueDetailPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/issues" element={<IssuesPage />} />
+                <Route path="/issues/:id" element={<IssueDetailPage />} />
+              </Route>
             </Route>
-          </Route>
 
-          {/* Default redirect */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </ToastProvider>
-    </BrowserRouter>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </ToastProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   )
 }
