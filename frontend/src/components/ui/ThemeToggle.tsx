@@ -17,13 +17,13 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       className={cn(
-        'group inline-flex rounded-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-2 focus:ring-offset-surface-base',
+        'group inline-flex rounded-full transition-transform duration-200 hover:scale-[1.00] active:scale-[0.96] focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-2 focus:ring-offset-surface-base',
         className
       )}
     >
       <span
         className={cn(
-          'relative flex h-9 w-[72px] items-center rounded-full border p-1 shadow-card transition-all duration-300',
+          'relative flex h-9 w-[73px] items-center rounded-full border p-1 shadow-card transition-all duration-300',
           isDark
             ? 'border-white/10 bg-gradient-to-r from-[#0f1424] via-[#171d31] to-[#0a0f1d]'
             : 'border-slate-300/90 bg-gradient-to-r from-[#f8fafc] via-[#eef2f7] to-[#dde5ef]'
