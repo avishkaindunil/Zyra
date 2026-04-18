@@ -1,0 +1,2 @@
+/api/*  https://zyra-3vxy.onrender.com/api/:splat  200
+/*      /index.html 200
