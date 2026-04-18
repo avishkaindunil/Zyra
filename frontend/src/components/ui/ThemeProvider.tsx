@@ -8,7 +8,7 @@ interface ThemeContextValue {
   toggleTheme: () => void
 }
 
-const STORAGE_KEY = 'Zyra-theme'
+const STORAGE_KEY = 'zyra-theme'
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 function getInitialTheme(): ThemeMode {
