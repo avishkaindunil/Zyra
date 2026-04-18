@@ -11,6 +11,7 @@ import { Pagination } from '../components/ui/Pagination'
 import { useToastContext } from '../components/ui/ToastProvider'
 import { useDebounce } from '../hooks/useDebounce'
 import { IssueFormData } from '../lib/schemas'
+import { ThemeToggle } from '../components/ui/ThemeToggle'
 
 export function IssuesPage() {
   const {
@@ -30,7 +31,6 @@ export function IssuesPage() {
   const { toast } = useToastContext()
   const [searchParams] = useSearchParams()
 
-  // Modal state
   const [formOpen, setFormOpen] = useState(false)
   const [editingIssue, setEditingIssue] = useState<Issue | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Issue | null>(null)
@@ -39,10 +39,8 @@ export function IssuesPage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
 
-  // Debounced search
   const debouncedSearch = useDebounce(filters.search, 400)
 
-  // Sync URL query params on mount
   useEffect(() => {
     const status = searchParams.get('status')
     const priority = searchParams.get('priority')
@@ -54,7 +52,6 @@ export function IssuesPage() {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Fetch when filters change (with debounced search)
   useEffect(() => {
     fetchIssues()
   }, [
@@ -147,44 +144,40 @@ export function IssuesPage() {
   const hasActiveFilters = !!(filters.search || filters.status || filters.priority || filters.severity)
 
   return (
-    <div className="p-6 space-y-5 page-enter">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-5 p-6 page-enter">
+      <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-content-primary">Issues</h1>
-          <p className="text-content-secondary text-sm mt-0.5">
+          <h1 className="font-display text-2xl font-bold text-content-primary">Issues</h1>
+          <p className="mt-0.5 text-sm text-content-secondary">
             {meta ? `${meta.total} issue${meta.total !== 1 ? 's' : ''} total` : 'Manage and track all issues'}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Export dropdown */}
+        <div className="flex items-center gap-2.5">
+          <ThemeToggle />
+
           <div className="relative group">
             <button className="btn-secondary gap-2" disabled={isExporting}>
               <Download size={15} />
               Export
             </button>
-            <div className="absolute right-0 top-full mt-1 w-40 bg-surface-elevated border border-border rounded-xl shadow-modal z-20 overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 animate-slide-down">
+            <div className="absolute right-0 top-full z-20 mt-1 w-40 overflow-hidden rounded-xl border border-border bg-surface-elevated shadow-modal invisible opacity-0 transition-all duration-150 group-hover:visible group-hover:opacity-100 animate-slide-down">
               <button
                 onClick={() => handleExport('csv')}
-                className="flex items-center gap-2.5 w-full px-3.5 py-2.5 text-sm text-content-secondary hover:text-content-primary hover:bg-surface-hover"
+                className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-content-secondary hover:bg-surface-hover hover:text-content-primary"
               >
                 Export CSV
               </button>
               <button
                 onClick={() => handleExport('json')}
-                className="flex items-center gap-2.5 w-full px-3.5 py-2.5 text-sm text-content-secondary hover:text-content-primary hover:bg-surface-hover"
+                className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-content-secondary hover:bg-surface-hover hover:text-content-primary"
               >
                 Export JSON
               </button>
             </div>
           </div>
 
-          <button
-            onClick={() => fetchIssues()}
-            className="btn-ghost p-2.5"
-            title="Refresh"
-          >
+          <button onClick={() => fetchIssues()} className="btn-ghost p-2.5" title="Refresh">
             <RefreshCw size={15} className={isLoading ? 'animate-spin' : ''} />
           </button>
 
@@ -195,14 +188,12 @@ export function IssuesPage() {
         </div>
       </div>
 
-      {/* Filters */}
       <IssueFiltersBar
         filters={filters}
         onFilterChange={handleFilterChange}
         onReset={resetFilters}
       />
 
-      {/* Table */}
       <div className="glass-card overflow-hidden">
         <IssueTable
           issues={issues}
@@ -224,16 +215,17 @@ export function IssuesPage() {
         )}
       </div>
 
-      {/* Issue form modal */}
       <IssueFormModal
         isOpen={formOpen}
-        onClose={() => { setFormOpen(false); setEditingIssue(null) }}
+        onClose={() => {
+          setFormOpen(false)
+          setEditingIssue(null)
+        }}
         onSubmit={handleFormSubmit}
         issue={editingIssue}
         isSubmitting={isSubmitting}
       />
 
-      {/* Delete confirm */}
       <ConfirmDialog
         isOpen={!!deleteTarget}
         title="Delete Issue"
@@ -244,7 +236,6 @@ export function IssuesPage() {
         onCancel={() => setDeleteTarget(null)}
       />
 
-      {/* Status change confirm */}
       <ConfirmDialog
         isOpen={!!statusTarget}
         title={statusTarget?.status === 'RESOLVED' ? 'Mark as Resolved' : 'Close Issue'}
