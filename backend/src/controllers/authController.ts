@@ -18,9 +18,13 @@ const loginSchema = z.object({
 })
 
 const generateToken = (userId: string): string => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET as string, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-  } as jwt.SignOptions)
+  return jwt.sign(
+    { userId },
+    process.env.JWT_SECRET as string,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    } as jwt.SignOptions
+  )
 }
 
 export const register = async (
@@ -47,15 +51,17 @@ export const register = async (
         email: data.email,
         password: hashedPassword,
       },
-      select: { id: true, email: true, name: true, createdAt: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+      },
     })
 
-    const token = generateToken(user.id)
-
     res.status(201).json({
-      message: 'Account created successfully',
+      message: 'Account created successfully. Please sign in to continue.',
       user,
-      token,
     })
   } catch (err) {
     next(err)
@@ -79,6 +85,7 @@ export const login = async (
     }
 
     const isPasswordValid = await bcrypt.compare(data.password, user.password)
+
     if (!isPasswordValid) {
       throw createError('Invalid email or password', 401)
     }
@@ -108,7 +115,12 @@ export const getMe = async (
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user!.id },
-      select: { id: true, email: true, name: true, createdAt: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+      },
     })
 
     if (!user) {

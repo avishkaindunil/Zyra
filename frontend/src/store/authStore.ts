@@ -9,7 +9,6 @@ interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
-
   login: (payload: LoginPayload) => Promise<void>
   register: (payload: RegisterPayload) => Promise<void>
   logout: () => void
@@ -28,9 +27,12 @@ export const useAuthStore = create<AuthState>()(
 
       login: async (payload) => {
         set({ isLoading: true, error: null })
+
         try {
           const { data } = await api.post('/auth/login', payload)
+
           localStorage.setItem('auth_token', data.token)
+
           set({
             user: data.user,
             token: data.token,
@@ -38,8 +40,10 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
           })
         } catch (err: unknown) {
-          const msg = (err as { response?: { data?: { message?: string } } })
-            ?.response?.data?.message || 'Login failed. Please try again.'
+          const msg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data
+              ?.message || 'Login failed. Please try again.'
+
           set({ error: msg, isLoading: false })
           throw new Error(msg)
         }
@@ -47,18 +51,23 @@ export const useAuthStore = create<AuthState>()(
 
       register: async (payload) => {
         set({ isLoading: true, error: null })
+
         try {
-          const { data } = await api.post('/auth/register', payload)
-          localStorage.setItem('auth_token', data.token)
+          await api.post('/auth/register', payload)
+
+          localStorage.removeItem('auth_token')
+
           set({
-            user: data.user,
-            token: data.token,
-            isAuthenticated: true,
+            user: null,
+            token: null,
+            isAuthenticated: false,
             isLoading: false,
           })
         } catch (err: unknown) {
-          const msg = (err as { response?: { data?: { message?: string } } })
-            ?.response?.data?.message || 'Registration failed. Please try again.'
+          const msg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data
+              ?.message || 'Registration failed. Please try again.'
+
           set({ error: msg, isLoading: false })
           throw new Error(msg)
         }
@@ -66,7 +75,13 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         localStorage.removeItem('auth_token')
-        set({ user: null, token: null, isAuthenticated: false, error: null })
+
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          error: null,
+        })
       },
 
       clearError: () => set({ error: null }),
