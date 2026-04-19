@@ -10,7 +10,7 @@ import { ThemeToggle } from '../components/ui/ThemeToggle'
 
 export function RegisterPage() {
   const navigate = useNavigate()
-  const { register: registerUser, isAuthenticated, isLoading, error, clearError } = useAuthStore()
+  const { register: registerUser, isLoading, error, clearError } = useAuthStore()
   const { toast } = useToastContext()
 
   const {
@@ -22,10 +22,6 @@ export function RegisterPage() {
   })
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/dashboard')
-  }, [isAuthenticated, navigate])
-
-  useEffect(() => {
     if (error) {
       toast(error, 'error')
       clearError()
@@ -34,113 +30,127 @@ export function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      await registerUser({ name: data.name, email: data.email, password: data.password })
-      toast('Account created! Welcome to Zyra.', 'success')
-      navigate('/dashboard')
+      await registerUser({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      })
+
+      toast('Account created successfully. Please sign in.', 'success')
+      navigate('/login')
     } catch {
       // error handled via store
     }
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-surface-base bg-gradient-mesh p-4">
-      <div className="fixed right-4 top-4 z-20">
+    <div className="min-h-screen bg-app-bg text-content-primary flex items-center justify-center px-6 py-10">
+      <div className="absolute top-6 right-6">
         <ThemeToggle />
       </div>
 
-      <div className="pointer-events-none fixed right-1/4 top-0 h-96 w-96 rounded-full bg-accent/8 blur-3xl" />
-      <div className="pointer-events-none fixed bottom-0 left-1/4 h-64 w-64 rounded-full bg-status-resolved/8 blur-3xl" />
-
-      <div className="w-full max-w-md animate-slide-up">
-        <div className="mb-8 flex flex-col items-center">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent shadow-glow-accent">
-            <Zap size={22} className="text-white" />
+      <div className="w-full max-w-md">
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-accent text-white shadow-soft mb-4">
+            <Zap size={26} />
           </div>
-          <h1 className="font-display text-3xl font-bold text-gradient-subtle">Zyra</h1>
-          <p className="mt-1 text-sm text-content-muted">Premium Issue Tracking</p>
+          <h1 className="font-display font-bold text-3xl text-gradient-subtle">Zyra</h1>
+          <p className="text-content-secondary mt-2">Premium Issue Tracking</p>
         </div>
 
-        <div className="glass-card p-8 shadow-card">
+        <div className="card-elevated p-8">
           <div className="mb-6">
-            <h2 className="font-display text-xl font-semibold text-content-primary">Create account</h2>
-            <p className="mt-1 text-sm text-content-secondary">
+            <h2 className="text-2xl font-semibold text-content-primary">Create account</h2>
+            <p className="text-content-secondary mt-2">
               Start tracking issues with your team today.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label className="label">Full name</label>
+              <label className="form-label">Full name</label>
               <div className="relative">
-                <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted" />
+                <User
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-content-muted"
+                />
                 <input
                   {...register('name')}
                   type="text"
+                  className="input-field pl-11"
                   placeholder="John Doe"
-                  autoComplete="name"
-                  className="input-field pl-9"
                 />
               </div>
               {errors.name && (
-                <p className="mt-1.5 text-xs text-priority-critical">{errors.name.message}</p>
+                <p className="mt-2 text-sm text-priority-critical">{errors.name.message}</p>
               )}
             </div>
 
             <div>
-              <label className="label">Email address</label>
+              <label className="form-label">Email address</label>
               <div className="relative">
-                <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted" />
+                <Mail
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-content-muted"
+                />
                 <input
                   {...register('email')}
                   type="email"
-                  placeholder="you@company.com"
-                  autoComplete="email"
-                  className="input-field pl-9"
+                  className="input-field pl-11"
+                  placeholder="john@company.com"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1.5 text-xs text-priority-critical">{errors.email.message}</p>
+                <p className="mt-2 text-sm text-priority-critical">{errors.email.message}</p>
               )}
             </div>
 
             <div>
-              <label className="label">Password</label>
+              <label className="form-label">Password</label>
               <div className="relative">
-                <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted" />
+                <Lock
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-content-muted"
+                />
                 <input
                   {...register('password')}
                   type="password"
-                  placeholder="Min. 8 characters"
-                  autoComplete="new-password"
-                  className="input-field pl-9"
+                  className="input-field pl-11"
+                  placeholder="Create a password"
                 />
               </div>
               {errors.password && (
-                <p className="mt-1.5 text-xs text-priority-critical">{errors.password.message}</p>
+                <p className="mt-2 text-sm text-priority-critical">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
             <div>
-              <label className="label">Confirm password</label>
+              <label className="form-label">Confirm password</label>
               <div className="relative">
-                <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted" />
+                <Lock
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-content-muted"
+                />
                 <input
                   {...register('confirmPassword')}
                   type="password"
-                  placeholder="Repeat your password"
-                  autoComplete="new-password"
-                  className="input-field pl-9"
+                  className="input-field pl-11"
+                  placeholder="Confirm your password"
                 />
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1.5 text-xs text-priority-critical">{errors.confirmPassword.message}</p>
+                <p className="mt-2 text-sm text-priority-critical">
+                  {errors.confirmPassword.message}
+                </p>
               )}
             </div>
 
-            <button type="submit" disabled={isLoading} className="btn-primary mt-2 w-full py-3">
+            <button type="submit" className="btn-primary w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin" />
                   Creating account...
                 </>
               ) : (
@@ -149,14 +159,12 @@ export function RegisterPage() {
             </button>
           </form>
 
-          <div className="mt-6 border-t border-border pt-5 text-center">
-            <p className="text-sm text-content-muted">
-              Already have an account?{' '}
-              <Link to="/login" className="font-medium text-accent transition-colors hover:text-accent-hover">
-                Sign in
-              </Link>
-            </p>
-          </div>
+          <p className="mt-6 text-center text-sm text-content-secondary">
+            Already have an account?{' '}
+            <Link to="/login" className="text-accent hover:text-accent-hover font-medium">
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>
