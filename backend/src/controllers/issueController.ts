@@ -21,12 +21,24 @@ const updateIssueSchema = z.object({
   severity: z.nativeEnum(Severity).optional(),
 })
 
+const getAuthenticatedUserId = (req: AuthRequest): string => {
+  const userId = req.user?.id
+
+  if (!userId) {
+    throw createError('Unauthorized', 401)
+  }
+
+  return userId
+}
+
 export const getIssues = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
+    const userId = getAuthenticatedUserId(req)
+
     const {
       page = '1',
       limit = '10',
@@ -38,11 +50,19 @@ export const getIssues = async (
       sortOrder = 'desc',
     } = req.query as Record<string, string>
 
-    const pageNum = Math.max(1, parseInt(page))
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit)))
+    const parsedPage = parseInt(page, 10)
+    const parsedLimit = parseInt(limit, 10)
+
+    const pageNum = Number.isNaN(parsedPage) ? 1 : Math.max(1, parsedPage)
+    const limitNum = Number.isNaN(parsedLimit)
+      ? 10
+      : Math.min(100, Math.max(1, parsedLimit))
+
     const skip = (pageNum - 1) * limitNum
 
-    const where: Prisma.IssueWhereInput = {}
+    const where: Prisma.IssueWhereInput = {
+      userId,
+    }
 
     if (search) {
       where.OR = [
@@ -100,10 +120,14 @@ export const getIssueById = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const userId = getAuthenticatedUserId(req)
     const { id } = req.params
 
-    const issue = await prisma.issue.findUnique({
-      where: { id },
+    const issue = await prisma.issue.findFirst({
+      where: {
+        id,
+        userId,
+      },
       include: {
         user: { select: { id: true, name: true, email: true } },
       },
@@ -125,12 +149,13 @@ export const createIssue = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const userId = getAuthenticatedUserId(req)
     const data = createIssueSchema.parse(req.body)
 
     const issue = await prisma.issue.create({
       data: {
         ...data,
-        userId: req.user!.id,
+        userId,
       },
       include: {
         user: { select: { id: true, name: true, email: true } },
@@ -149,10 +174,17 @@ export const updateIssue = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const userId = getAuthenticatedUserId(req)
     const { id } = req.params
     const data = updateIssueSchema.parse(req.body)
 
-    const existing = await prisma.issue.findUnique({ where: { id } })
+    const existing = await prisma.issue.findFirst({
+      where: {
+        id,
+        userId,
+      },
+    })
+
     if (!existing) {
       throw createError('Issue not found', 404)
     }
@@ -177,14 +209,24 @@ export const deleteIssue = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const userId = getAuthenticatedUserId(req)
     const { id } = req.params
 
-    const existing = await prisma.issue.findUnique({ where: { id } })
+    const existing = await prisma.issue.findFirst({
+      where: {
+        id,
+        userId,
+      },
+    })
+
     if (!existing) {
       throw createError('Issue not found', 404)
     }
 
-    await prisma.issue.delete({ where: { id } })
+    await prisma.issue.delete({
+      where: { id },
+    })
+
     res.json({ message: 'Issue deleted successfully' })
   } catch (err) {
     next(err)
@@ -197,11 +239,24 @@ export const getStats = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const userId = getAuthenticatedUserId(req)
+
     const [statusGroups, priorityGroups, total, recentIssues] = await Promise.all([
-      prisma.issue.groupBy({ by: ['status'], _count: { _all: true } }),
-      prisma.issue.groupBy({ by: ['priority'], _count: { _all: true } }),
-      prisma.issue.count(),
+      prisma.issue.groupBy({
+        by: ['status'],
+        where: { userId },
+        _count: { _all: true },
+      }),
+      prisma.issue.groupBy({
+        by: ['priority'],
+        where: { userId },
+        _count: { _all: true },
+      }),
+      prisma.issue.count({
+        where: { userId },
+      }),
       prisma.issue.findMany({
+        where: { userId },
         take: 5,
         orderBy: { createdAt: 'desc' },
         include: { user: { select: { id: true, name: true } } },
@@ -211,6 +266,7 @@ export const getStats = async (
     const statusCounts = Object.fromEntries(
       statusGroups.map((g) => [g.status, g._count._all])
     )
+
     const priorityCounts = Object.fromEntries(
       priorityGroups.map((g) => [g.priority, g._count._all])
     )
@@ -242,17 +298,27 @@ export const exportIssues = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const userId = getAuthenticatedUserId(req)
     const { format = 'json' } = req.query as { format?: string }
 
     const issues = await prisma.issue.findMany({
+      where: { userId },
       orderBy: { createdAt: 'desc' },
       include: { user: { select: { name: true, email: true } } },
     })
 
     if (format === 'csv') {
       const headers = [
-        'ID', 'Title', 'Description', 'Status', 'Priority', 'Severity',
-        'Created By', 'Email', 'Created At', 'Updated At',
+        'ID',
+        'Title',
+        'Description',
+        'Status',
+        'Priority',
+        'Severity',
+        'Created By',
+        'Email',
+        'Created At',
+        'Updated At',
       ]
 
       const rows = issues.map((issue) => [
