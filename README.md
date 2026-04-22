@@ -270,10 +270,8 @@ CLIENT_URL=https://your-frontend-domain.com
 ```
 
 ---
-
+<!--
 ## Notes
-
-A few things worth mentioning:
 
 - This project uses Prisma as the ORM layer for MySQL
 - State management on the frontend is handled with Zustand
@@ -300,3 +298,4 @@ Some useful next steps for this project could be:
 ## Author
 
 Built as a full-stack issue tracker project using React, TypeScript, Express, Prisma, and MySQL.
+-->
